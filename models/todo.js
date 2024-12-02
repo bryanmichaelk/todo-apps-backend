@@ -1,27 +1,29 @@
-import express from 'express';
-import { 
-  passwordConfig as SQLAuthentication
-} from '../config.js';
-import { createDatabaseConnection } from '../config/database.js';
+import express from "express";
+import { passwordConfig as SQLAuthentication } from "../config.js";
+import { createDatabaseConnection } from "../config/database.js";
 
 const router = express.Router();
 router.use(express.json());
 
 const database = await createDatabaseConnection(SQLAuthentication);
 
-router.get('/priorities', async (req, res) => {
+router.get("/priorities", async (req, res) => {
   try {
     // Return a list of priorities
     const priorities = await database.readAllPriorities();
-    console.log(`priorities: ${JSON.stringify(priorities)}`);
+    if (priorities != null) {
+      console.log(`priorities: ${JSON.stringify(priorities)}`);
+    } else {
+      console.log("priorities is null");
+    }
+
     res.status(200).json(priorities);
   } catch (err) {
     res.status(500).json({ error: err?.message });
   }
 });
 
-
-router.get('/priorities/:id', async (req, res) => {
+router.get("/priorities/:id", async (req, res) => {
   try {
     // Get the priorities with the specified ID
     const prioritiesId = req.params.id;
@@ -38,7 +40,7 @@ router.get('/priorities/:id', async (req, res) => {
   }
 });
 
-router.get('/categories', async (req, res) => {
+router.get("/categories", async (req, res) => {
   try {
     // Return a list of categories
     const categories = await database.readAllCategories();
@@ -49,14 +51,19 @@ router.get('/categories', async (req, res) => {
   }
 });
 
-
-router.get('/categories/:id', async (req, res) => {
+router.get("/categories/:id", async (req, res) => {
   try {
     // Get the categories with the specified ID
     const categoriesId = req.params.id;
+<<<<<<< Updated upstream
     console.log(`categoriesId: ${categoriesId}`);
     if (categoriesId) {
     const result = await database.readPriorities(categoriesId);
+=======
+    console.log(`categoriesId: ${categoriesIdId}`);
+    if (categoriesIdId) {
+      const result = await database.readPriorities(categoriesIdId);
+>>>>>>> Stashed changes
       console.log(`categories: ${JSON.stringify(result)}`);
       res.status(200).json(result);
     } else {
@@ -67,6 +74,7 @@ router.get('/categories/:id', async (req, res) => {
   }
 });
 
+<<<<<<< Updated upstream
 router.get('/tasks', async (req, res) => {
   try {
     // Return a list of tasks
@@ -148,3 +156,6 @@ router.delete('/tasks/:id', async (req, res) => {
 
 
 export default router;
+=======
+export default router;
+>>>>>>> Stashed changes
