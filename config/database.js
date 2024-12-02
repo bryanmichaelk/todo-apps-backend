@@ -75,9 +75,45 @@ export default class Database {
   }
 
   // Tasks
+  // Return all Tasks
+  async readAllTasks() {
+    const request = this.poolconnection.request();
+    const result = await request.query(`SELECT * FROM tasks`);
+
+    return result.recordsets;
+  }
+
+  async createTasks(data) {
+    const request = this.poolconnection.request();
   
+    // Menambahkan input parameter ke query
+    request.input('name', sql.NVarChar(255), data.name);
+    request.input('priority_id', sql.Int, data.priority_id);
+    request.input('category_id', sql.Int, data.category_id);
+    request.input('due_date', sql.Date, data.due_date);
   
+    // Query untuk menyisipkan data ke tabel 'tasks'
+    const result = await request.query(
+      `INSERT INTO tasks (name, priority_id, category_id, due_date) 
+       VALUES (@name, @priority_id, @category_id, @due_date)`
+    );
+  
+    // Mengembalikan jumlah baris yang terpengaruh
+    return result.rowsAffected[0];
+  }
+  async deleteTasks(id) {
+    const idAsNumber = Number(id);
+
+    const request = this.poolconnection.request();
+    const result = await request
+      .input('id', sql.Int, idAsNumber)
+      .query(`DELETE FROM tasks WHERE id = @id`);
+
+    return result.rowsAffected[0];
+  }
 }
+  
+
 
 export const createDatabaseConnection = async (passwordConfig) => {
   const database = new Database(passwordConfig);
