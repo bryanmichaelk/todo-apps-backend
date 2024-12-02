@@ -23,38 +23,54 @@ jobs:
   #     with:
   #       node-version: ${{ matrix.node-version }}
   #   - name: Install dependencies
-  #     working-directory: ./
-  #     run: npm install
+  #     run: npm ci
   #   - name: Run tests
   #     working-directory: ./
   #     run: npm run lint
+  # build:
+  #   runs-on: ubuntu-latest
+  #   # needs: test
+  #   strategy:
+  #     matrix:
+  #       node-version: [20.x]
+  #   steps:
+  #   - name: Checkout source
+  #     uses: actions/checkout@v3
+  #   - name: Set up Node.js version
+  #     uses: actions/setup-node@v3
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #   - name: Install dependencies
+  #     working-directory: ./
+  #     run: npm install
+    
+  #   - name: Build
+  #     working-directory: ./
+  #     run: npm run build
+
+  #   - name: Upload artifact for deployment job
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: dist
+  #       path: ./dist
   build:
     runs-on: ubuntu-latest
-    # needs: test
     strategy:
       matrix:
         node-version: [20.x]
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v4
-    - name: Set up Node.js version
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Install dependencies
-      working-directory: ./
-      run: npm install
-    
-    - name: Build
-      working-directory: ./
-      run: npm run build
-
-    - name: Upload artifact for deployment job
-      uses: actions/upload-artifact@v2
-      with:
-        name: dist
-        path: ./dist
-
+        - name: Checkout source
+          uses: actions/checkout@v4
+        - name: Set up Node.js
+          uses: actions/setup-node@v2
+          with:
+            node-version: {{ matrix.node-version }}
+        - name: Install dependencies
+          run: npm install
+        uses: actions/upload-artifact@v2
+        with:
+          name: express-source
+          path: ./
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -64,13 +80,13 @@ jobs:
         - name: Download artifact from build job
           uses: actions/download-artifact@v2
           with:
-            name: dist
-            path: ./dist
+            name: express-source
+            path: ./
         - name: Deploy to Azure Web App
           uses: azure/webapps-deploy@v2
           with:
             app-name: 'todo-app-backend'
             slot-name: 'production'
             publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-            package: ./dist
+            package: ./
 
