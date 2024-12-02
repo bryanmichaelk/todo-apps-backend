@@ -18,10 +18,10 @@ jobs:
         node-version: [20.x]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       
       - name: Set up Node.js version
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -35,7 +35,7 @@ jobs:
       #   run: npm test
 
       - name: Upload source for deployment
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: express-source
           path: ./
@@ -46,7 +46,7 @@ jobs:
     needs: test
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Download source artifact
         uses: actions/download-artifact@v2
@@ -55,7 +55,7 @@ jobs:
           path: ./
 
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'express-app-backend'
           slot-name: 'production'
