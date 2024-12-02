@@ -10,54 +10,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Continuous Integration (CI)
-  test:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
     steps:
-      - name: Checkout source
+      - name: Checkout Source
         uses: actions/checkout@v3
-      
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
+      - name: Setup Node.js version
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install dependencies
-        run: npm ci
-      
-      # - name: Lint code
-      #   run: npm run lint
-
-      # - name: Run tests
-      #   run: npm test
-
-      - name: Upload source for deployment
-        uses: actions/upload-artifact@v3
+          node-version: '20.x'
+      - name: Install Dependencies
+        run: npm install
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
         with:
-          name: express-source
-          path: ./
-
-  # Continuous Deployment (CD)
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
-
-      - name: Download source artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: express-source
-          path: ./
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'express-app-backend'
+          app-name: 'todo-app-backend'
           slot-name: 'production'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./
+          package: .
