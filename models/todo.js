@@ -55,7 +55,6 @@ router.get("/categories/:id", async (req, res) => {
   try {
     // Get the categories with the specified ID
     const categoriesId = req.params.id;
-<<<<<<< Updated upstream
     console.log(`categoriesId: ${categoriesId}`);
     if (categoriesId) {
     const result = await database.readCategories(categoriesId);
@@ -202,6 +201,3 @@ router.delete('/tasks/:id', async (req, res) => {
 
 
 export default router;
-=======
-export default router;
->>>>>>> Stashed changes
