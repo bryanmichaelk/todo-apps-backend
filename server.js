@@ -26,7 +26,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.listen(5000, () => console.log("Server up and running..."));
+app.listen(port, () => console.log("Server up and running..."));
 app.use('/api/todo', todoRoutes);
 
 app.get("/get", (req, res) => {
