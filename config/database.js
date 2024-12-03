@@ -73,6 +73,44 @@ export default class Database {
 
     return result.recordset[0];
   }
+  async createCategories(data) {
+    const request = this.poolconnection.request();
+  
+    // Menambahkan input parameter ke query
+    request.input('name', sql.NVarChar(255), data.name);
+  
+    // Query untuk menyisipkan data ke tabel 'tasks'
+    const result = await request.query(
+      `INSERT INTO categories (name) 
+       VALUES (@name)`
+    );
+  
+    // Mengembalikan jumlah baris yang terpengaruh
+    return result.rowsAffected[0];
+  }
+  async updateCategories(id, data) {
+    const idAsNumber = Number(id);
+    const request = this.poolconnection.request();
+      
+
+    request.input('name', sql.NVarChar(255), data.name);
+
+    const result = await request
+    .input('id', sql.Int, idAsNumber)
+    .query(`UPDATE categories SET name=@name WHERE id=@id`);
+
+    return result.rowsAffected[0];
+  }
+  async deleteCategories(id) {
+    const idAsNumber = Number(id);
+
+    const request = this.poolconnection.request();
+    const result = await request
+      .input('id', sql.Int, idAsNumber)
+      .query(`DELETE FROM categories WHERE id = @id`);
+
+    return result.rowsAffected[0];
+  }
 
   // Tasks
   // Return all Tasks
@@ -101,6 +139,24 @@ export default class Database {
     // Mengembalikan jumlah baris yang terpengaruh
     return result.rowsAffected[0];
   }
+
+  async updateTasks(id, data) {
+    const idAsNumber = Number(id);
+    const request = this.poolconnection.request();
+      
+
+    request.input('name', sql.NVarChar(255), data.name);
+    request.input('priority_id', sql.Int, data.priority_id);
+    request.input('category_id', sql.Int, data.category_id);
+    request.input('due_date', sql.Date, data.due_date);
+
+    const result = await request
+    .input('id', sql.Int, idAsNumber)
+    .query(`UPDATE tasks SET name=@name, priority_id = @priority_id,category_id=@category_id,due_date=@due_date WHERE id = @id`
+    );
+
+    return result.rowsAffected[0];
+  }
   async deleteTasks(id) {
     const idAsNumber = Number(id);
 
@@ -112,8 +168,6 @@ export default class Database {
     return result.rowsAffected[0];
   }
 }
-  
-
 
 export const createDatabaseConnection = async (passwordConfig) => {
   const database = new Database(passwordConfig);

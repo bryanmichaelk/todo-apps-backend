@@ -27,7 +27,7 @@ app.use(cors());
 app.use(express.json());
 
 app.listen(5000, () => console.log("Server up and running..."));
-app.use('/todo', todoRoutes);
+app.use('/api/todo', todoRoutes);
 
 app.get("/get", (req, res) => {
   res.status(200).json({

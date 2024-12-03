@@ -56,7 +56,7 @@ router.get('/categories/:id', async (req, res) => {
     const categoriesId = req.params.id;
     console.log(`categoriesId: ${categoriesId}`);
     if (categoriesId) {
-    const result = await database.readPriorities(categoriesId);
+    const result = await database.readCategories(categoriesId);
       console.log(`categories: ${JSON.stringify(result)}`);
       res.status(200).json(result);
     } else {
@@ -66,6 +66,58 @@ router.get('/categories/:id', async (req, res) => {
     res.status(500).json({ error: err?.message });
   }
 });
+
+router.post('/categories', async (req, res) => {
+  try {
+    // add a tasks
+    const categories = req.body;
+    console.log(`categories: ${JSON.stringify(categories)}`);
+    const rowsAffected = await database.createCategories(categories);
+    res.status(201).json({ rowsAffected });
+  } catch (err) {
+    res.status(500).json({ error: err?.message });
+  }
+});
+
+router.put('/categories/:id', async (req, res) => {
+  try {
+    // Update the tasks with the specified ID
+    const categoriesId = req.params.id;
+    console.log(`categoriesId: ${categoriesId}`);
+    const categories = req.body;
+
+    if (categoriesId && categories) {
+      delete categories.id;
+      console.log(`categories: ${JSON.stringify(categories)}`);
+      const rowsAffected = await database.updateCategories(categoriesId, categories);
+      res.status(200).json({ rowsAffected });
+    } else {
+      res.status(404);
+    }
+  } catch (err) {
+    res.status(500).json({ error: err?.message });
+  }
+});
+router.delete('/categories/:id', async (req, res) => {
+  try {
+    // Delete the person with the specified ID
+    const categoriesId = req.params.id;
+    console.log(`categoriesId: ${categoriesId}`);
+
+    if (!categoriesId) {
+      res.status(404);
+    } else {
+      const rowsAffected = await database.deleteCategories(categoriesId);
+      res.status(204).json({ rowsAffected });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err?.message });
+  }
+});
+
+
+
+
 
 router.get('/tasks', async (req, res) => {
   try {
@@ -117,7 +169,7 @@ router.put('/tasks/:id', async (req, res) => {
     if (tasksId && tasks) {
       delete tasks.id;
       console.log(`tasks: ${JSON.stringify(tasks)}`);
-      const rowsAffected = await database.update(tasksId, tasks);
+      const rowsAffected = await database.updateTasks(tasksId, tasks);
       res.status(200).json({ rowsAffected });
     } else {
       res.status(404);
