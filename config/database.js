@@ -201,39 +201,58 @@ async updateTasks(id, data) {
   const idAsNumber = Number(id);
   const request = this.poolconnection.request();
 
-  // Cari ID priority berdasarkan nama
-  const priorityId = await this.getPriorityIdByName(data.priority_name);
-  if (!priorityId) {
-      throw new Error(`Priority dengan nama "${data.priority_name}" tidak ditemukan.`);
+  // Cari ID priority berdasarkan nama (jika diberikan)
+  let priorityId = null;
+  if (data.priority_name) {
+      priorityId = await this.getPriorityIdByName(data.priority_name);
+      if (!priorityId) {
+          throw new Error(`Priority dengan nama "${data.priority_name}" tidak ditemukan.`);
+      }
   }
 
-  // Cari ID category berdasarkan nama
-  const categoryId = await this.getCategoryIdByName(data.category_name);
-  if (!categoryId) {
-      throw new Error(`Category dengan nama "${data.category_name}" tidak ditemukan.`);
+  // Cari ID category berdasarkan nama (jika diberikan)
+  let categoryId = null;
+  if (data.category_name) {
+      categoryId = await this.getCategoryIdByName(data.category_name);
+      if (!categoryId) {
+          throw new Error(`Category dengan nama "${data.category_name}" tidak ditemukan.`);
+      }
   }
 
   // Menambahkan input parameter untuk query UPDATE
   request.input('name', sql.NVarChar(255), data.name);
-  request.input('priority_id', sql.Int, priorityId);
-  request.input('category_id', sql.Int, categoryId);
+  if (priorityId !== null) {
+      request.input('priority_id', sql.Int, priorityId);
+  }
+  if (categoryId !== null) {
+      request.input('category_id', sql.Int, categoryId);
+  }
   request.input('due_date', sql.Date, data.due_date);
+
+  // Tambahkan input untuk isDone (jika diberikan)
+  if (typeof data.isDone !== "undefined") {
+      request.input('isDone', sql.Bit, data.isDone);
+  }
+
+  // Query UPDATE
+  const columnsToUpdate = [];
+  if (data.name) columnsToUpdate.push("name = @name");
+  if (priorityId !== null) columnsToUpdate.push("priority_id = @priority_id");
+  if (categoryId !== null) columnsToUpdate.push("category_id = @category_id");
+  if (data.due_date) columnsToUpdate.push("due_date = @due_date");
+  if (typeof data.isDone !== "undefined") columnsToUpdate.push("isDone = @isDone");
 
   const result = await request
       .input('id', sql.Int, idAsNumber)
       .query(`
           UPDATE tasks 
-          SET name = @name, 
-              priority_id = @priority_id, 
-              category_id = @category_id, 
-              due_date = @due_date 
+          SET ${columnsToUpdate.join(", ")}
           WHERE id = @id
       `);
 
   return result.rowsAffected[0];
 }
 
-  
   async deleteTasks(id) {
     const idAsNumber = Number(id);
 
