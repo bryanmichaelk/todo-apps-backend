@@ -137,7 +137,7 @@ router.get('/tasks/:id', async (req, res) => {
     const tasksId = req.params.id;
     console.log(`tasksId: ${tasksId}`);
     if (tasksId) {
-    const result = await database.readAllTasks(tasksId);
+    const result = await database.readTasks(tasksId);
       console.log(`tasks: ${JSON.stringify(result)}`);
       res.status(200).json(result);
     } else {

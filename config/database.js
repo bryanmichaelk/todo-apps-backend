@@ -116,9 +116,20 @@ export default class Database {
   // Return all Tasks
   async readAllTasks() {
     const request = this.poolconnection.request();
-    const result = await request.query(`SELECT * FROM tasks`);
+    const result = await request.query(`SELECT tasks.id,tasks.name as title,priorities.name as priority,categories.name as category,tasks.due_date 
+      FROM tasks inner join priorities on tasks.priority_id = priorities.id inner join categories on tasks.category_id = categories.id`);
 
     return result.recordsets;
+  }
+
+  async readTasks(id) {
+    const request = this.poolconnection.request();
+    const result = await request
+      .input('id', sql.Int, +id)
+      .query(`SELECT tasks.id,tasks.name as title,priorities.name as priority,categories.name as category,tasks.due_date 
+      FROM tasks inner join priorities on tasks.priority_id = priorities.id inner join categories on tasks.category_id = categories.id WHERE tasks.id = @id`);
+
+    return result.recordset[0];
   }
 
   async getPriorityIdByName(priorityName) {
