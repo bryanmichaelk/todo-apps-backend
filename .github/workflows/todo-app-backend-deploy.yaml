@@ -10,50 +10,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js version
+        uses: actions/checkout@v3
+      - name: Setup Node.js version
         uses: actions/setup-node@v4
         with:
-          node-version: ${{matrix.node-version}}
-
-      - name: Install dependencies
-        working-directory: .
+          node-version: '20.x'
+      - name: Install Dependencies
         run: npm install
-
-      - name: Build
-        working-directory: .
-        run: npm run build
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist
-          path: ./dist
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
-
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: dist
-          path: ./dist
-
       - name: Deploy to Azure App Service
-        uses: Azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v2
         with:
-          app-name: "todo-apps-backend-test"
+          app-name: 'todo-apps-backend'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./dist
+          package: .
