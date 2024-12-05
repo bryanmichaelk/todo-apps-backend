@@ -116,7 +116,7 @@ export default class Database {
   // Return all Tasks
   async readAllTasks() {
     const request = this.poolconnection.request();
-    const result = await request.query(`SELECT tasks.id,tasks.name as title,priorities.name as priority,categories.name as category,tasks.due_date 
+    const result = await request.query(`SELECT tasks.id,tasks.name as title,priorities.name as priority,categories.name as category,tasks.due_date,tasks.isDone as isDone
       FROM tasks inner join priorities on tasks.priority_id = priorities.id inner join categories on tasks.category_id = categories.id`);
 
     return result.recordsets;
@@ -126,7 +126,7 @@ export default class Database {
     const request = this.poolconnection.request();
     const result = await request
       .input('id', sql.Int, +id)
-      .query(`SELECT tasks.id,tasks.name as title,priorities.name as priority,categories.name as category,tasks.due_date 
+      .query(`SELECT tasks.id,tasks.name as title,priorities.name as priority,categories.name as category,tasks.due_date,tasks.isDone as isDone
       FROM tasks inner join priorities on tasks.priority_id = priorities.id inner join categories on tasks.category_id = categories.id WHERE tasks.id = @id`);
 
     return result.recordset[0];
@@ -197,23 +197,42 @@ async getCategoryIdByName(categoryName) {
     return result.rowsAffected[0];
 }
 
-  async updateTasks(id, data) {
-    const idAsNumber = Number(id);
-    const request = this.poolconnection.request();
-      
+async updateTasks(id, data) {
+  const idAsNumber = Number(id);
+  const request = this.poolconnection.request();
 
-    request.input('name', sql.NVarChar(255), data.name);
-    request.input('priority_id', sql.Int, data.priority_id);
-    request.input('category_id', sql.Int, data.category_id);
-    request.input('due_date', sql.Date, data.due_date);
-
-    const result = await request
-    .input('id', sql.Int, idAsNumber)
-    .query(`UPDATE tasks SET name=@name, priority_id = @priority_id,category_id=@category_id,due_date=@due_date WHERE id = @id`
-    );
-
-    return result.rowsAffected[0];
+  // Cari ID priority berdasarkan nama
+  const priorityId = await this.getPriorityIdByName(data.priority_name);
+  if (!priorityId) {
+      throw new Error(`Priority dengan nama "${data.priority_name}" tidak ditemukan.`);
   }
+
+  // Cari ID category berdasarkan nama
+  const categoryId = await this.getCategoryIdByName(data.category_name);
+  if (!categoryId) {
+      throw new Error(`Category dengan nama "${data.category_name}" tidak ditemukan.`);
+  }
+
+  // Menambahkan input parameter untuk query UPDATE
+  request.input('name', sql.NVarChar(255), data.name);
+  request.input('priority_id', sql.Int, priorityId);
+  request.input('category_id', sql.Int, categoryId);
+  request.input('due_date', sql.Date, data.due_date);
+
+  const result = await request
+      .input('id', sql.Int, idAsNumber)
+      .query(`
+          UPDATE tasks 
+          SET name = @name, 
+              priority_id = @priority_id, 
+              category_id = @category_id, 
+              due_date = @due_date 
+          WHERE id = @id
+      `);
+
+  return result.rowsAffected[0];
+}
+
   
   async deleteTasks(id) {
     const idAsNumber = Number(id);

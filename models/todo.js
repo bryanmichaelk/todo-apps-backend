@@ -74,7 +74,7 @@ router.post('/categories', async (req, res) => {
     const categories = req.body;
     console.log(`categories: ${JSON.stringify(categories)}`);
     const rowsAffected = await database.createCategories(categories);
-    res.status(201).json({ rowsAffected });
+    res.status(201).json({ message: 'Category created successfully',rowsAffected });
   } catch (err) {
     res.status(500).json({ error: err?.message });
   }
