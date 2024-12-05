@@ -150,15 +150,25 @@ router.get('/tasks/:id', async (req, res) => {
 
 router.post('/tasks', async (req, res) => {
   try {
-    // add a tasks
+    // Ambil data dari body request
     const tasks = req.body;
-    console.log(`tasks: ${JSON.stringify(tasks)}`);
-    const rowsAffected = await database.createTasks(tasks);
-    res.status(201).json({ rowsAffected });
+
+    // Validasi apakah data lengkap
+    if (!tasks.name || !tasks.priority_name || !tasks.category_name || !tasks.due_date) {
+      return res.status(400).json({ error: 'Field name, priority_name, category_name, and due_date are required.' });
+    }
+
+    // Panggil fungsi createTasksWithNames untuk memproses input
+    const rowsAffected = await database.createTasksWithNames(tasks);
+
+    // Kirimkan respons sukses
+    res.status(201).json({ message: 'Task created successfully', rowsAffected });
   } catch (err) {
-    res.status(500).json({ error: err?.message });
+    // Tangani error
+    res.status(500).json({ error: err.message });
   }
 });
+
 
 router.put('/tasks/:id', async (req, res) => {
   try {

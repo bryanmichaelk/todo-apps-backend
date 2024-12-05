@@ -121,24 +121,70 @@ export default class Database {
     return result.recordsets;
   }
 
-  async createTasks(data) {
+  async getPriorityIdByName(priorityName) {
     const request = this.poolconnection.request();
-  
-    // Menambahkan input parameter ke query
+
+    // Menambahkan input parameter untuk mencari ID priority berdasarkan nama
+    request.input('priority_name', sql.NVarChar(255), priorityName);
+
+    // Query untuk mencari ID priority
+    const result = await request.query(
+        `SELECT id 
+         FROM priorities 
+         WHERE name = @priority_name`
+    );
+
+    // Jika hasil ditemukan, kembalikan ID
+    return result.recordset.length > 0 ? result.recordset[0].id : null;
+}
+
+async getCategoryIdByName(categoryName) {
+  const request = this.poolconnection.request();
+
+  // Menambahkan input parameter untuk mencari ID category berdasarkan nama
+  request.input('category_name', sql.NVarChar(255), categoryName);
+
+  // Query untuk mencari ID category
+  const result = await request.query(
+      `SELECT id 
+       FROM categories 
+       WHERE name = @category_name`
+  );
+
+  // Jika hasil ditemukan, kembalikan ID
+  return result.recordset.length > 0 ? result.recordset[0].id : null;
+}
+
+  async createTasksWithNames(data) {
+    const request = this.poolconnection.request();
+
+    // Cari ID priority berdasarkan nama
+    const priorityId = await this.getPriorityIdByName(data.priority_name);
+    if (!priorityId) {
+        throw new Error(`Priority dengan nama "${data.priority_name}" tidak ditemukan.`);
+    }
+
+    // Cari ID category berdasarkan nama
+    const categoryId = await this.getCategoryIdByName(data.category_name);
+    if (!categoryId) {
+        throw new Error(`Category dengan nama "${data.category_name}" tidak ditemukan.`);
+    }
+
+    // Menambahkan input parameter untuk insert data
     request.input('name', sql.NVarChar(255), data.name);
-    request.input('priority_id', sql.Int, data.priority_id);
-    request.input('category_id', sql.Int, data.category_id);
+    request.input('priority_id', sql.Int, priorityId);
+    request.input('category_id', sql.Int, categoryId);
     request.input('due_date', sql.Date, data.due_date);
-  
+
     // Query untuk menyisipkan data ke tabel 'tasks'
     const result = await request.query(
-      `INSERT INTO tasks (name, priority_id, category_id, due_date) 
-       VALUES (@name, @priority_id, @category_id, @due_date)`
+        `INSERT INTO tasks (name, priority_id, category_id, due_date) 
+         VALUES (@name, @priority_id, @category_id, @due_date)`
     );
-  
+
     // Mengembalikan jumlah baris yang terpengaruh
     return result.rowsAffected[0];
-  }
+}
 
   async updateTasks(id, data) {
     const idAsNumber = Number(id);
@@ -157,6 +203,7 @@ export default class Database {
 
     return result.rowsAffected[0];
   }
+  
   async deleteTasks(id) {
     const idAsNumber = Number(id);
 
