@@ -1,8 +1,8 @@
 #Start your image with a node base image
-FROM node:18-alpine
+FROM node:20-alpine
 
-# Install Python and build dependencies (for node-gyp)
-RUN apk add --no-cache python3 py3-pip make g++ libgcc
+# # Install Python and build dependencies (for node-gyp)
+# RUN apk add --no-cache python3 py3-pip make g++ libgcc
 
 # The /app directory should act as the main application
 WORKDIR /app
