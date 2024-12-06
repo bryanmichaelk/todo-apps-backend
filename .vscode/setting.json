@@ -1,3 +1,0 @@
-{
-    "appService.zipIgnorePattern": ["./.env*","node_modules{,/**}"]
-}
