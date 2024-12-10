@@ -1,29 +1,47 @@
-name: CI/CD for Express.js Project
+name: Node.JS CI/CD
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [main]
 
 jobs:
-  build-and-deploy:
+  # test:
+  #   name: Test
+  #   runs-on: ubuntu-latest
+
+  #   strategy:
+  #     matrix:
+  #       node-version: [20.x]
+
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3 # was "v2" before
+  #       with:
+  #         fetch-depth: 0
+
+  #     - name: Use Node.JS ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v3 # was "v2" before
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+
+  #     - name: NPM install, build and test
+  #       run: |
+  #         npm install
+  #         npm run 
+  #       env:
+  #         DBHOST: ${{ secrets.DBHOST }}
+  #         TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+  #         JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+
+  # Heavily modified deploy job to fit render.com
+  deploy:
+    name: Deploy
+    # needs: [test] # Our tests must pass in order to run the deploy job
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v3
-      - name: Setup Node.js version
-        uses: actions/setup-node@v4
+      - name: Deploy to production
+        uses: johnbeynon/render-deploy-action@v0.0.8
         with:
-          node-version: "20.x"
-      - name: Install Dependencies
-        run: npm install
-      - name: Deploy to Render
-        run: |
-          curl -X POST -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d '{"serviceId": "https://render.com/docs/pull-request-previews#:~:text=Test%20proposed%20changes%20in%20a,(for%20image%2Dbacked%20services)"}' \
-          https://api.render.com/deploys
+          service-id: ${{ secrets.SERVICE_ID }} # Can be found as part of the Deploy Hook
+          api-key: ${{ secrets.RENDER_API_KEY }} # Create your API key in Render Dashboard > Account Settings
