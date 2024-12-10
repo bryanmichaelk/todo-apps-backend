@@ -39,7 +39,7 @@ app.get("/get", (req, res) => {
 
 // Define route for the root path
 app.get('/', (req, res) => {
-    res.status(200).send('Welcome to the Todo App API! Dor');
+    res.status(200).send('Welcome to the Todo App API!');
 });
 
 // const PORT = 5000;
