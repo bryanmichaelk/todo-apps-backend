@@ -1,10 +1,26 @@
 name: Node.JS CI/CD
 
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
+  workflow_dispatch:
 
 jobs:
+  DemoSonarCloudScan:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+        - name: SonarCloud Scan
+          uses: sonarsource/sonarcloud-github-action@master
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          with:
+            args: >
+              -Dsonar.projectKey=todo-apps-backend
+              -Dsonar.organization=bryanmichaelk
   # test:
   #   name: Test
   #   runs-on: ubuntu-latest
@@ -34,14 +50,14 @@ jobs:
   #         JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
 
   # Heavily modified deploy job to fit render.com
-  deploy:
-    name: Deploy
-    # needs: [test] # Our tests must pass in order to run the deploy job
-    runs-on: ubuntu-latest
+  # deploy:
+  #   name: Deploy
+  #   # needs: [test] # Our tests must pass in order to run the deploy job
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Deploy to production
-        uses: johnbeynon/render-deploy-action@v0.0.8
-        with:
-          service-id: ${{ secrets.SERVICE_ID }} # Can be found as part of the Deploy Hook
-          api-key: ${{ secrets.RENDER_API_KEY }} # Create your API key in Render Dashboard > Account Settings
+  #   steps:
+  #     - name: Deploy to production
+  #       uses: johnbeynon/render-deploy-action@v0.0.8
+  #       with:
+  #         service-id: ${{ secrets.SERVICE_ID }} # Can be found as part of the Deploy Hook
+  #         api-key: ${{ secrets.RENDER_API_KEY }} # Create your API key in Render Dashboard > Account Settings
