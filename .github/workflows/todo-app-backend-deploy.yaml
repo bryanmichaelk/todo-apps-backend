@@ -18,12 +18,12 @@ jobs:
       - name: Setup Node.js version
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20.x"
       - name: Install Dependencies
         run: npm install
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v21
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Deploy to Render
+        run: |
+          curl -X POST -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"serviceId": "https://render.com/docs/pull-request-previews#:~:text=Test%20proposed%20changes%20in%20a,(for%20image%2Dbacked%20services)"}' \
+          https://api.render.com/deploys
