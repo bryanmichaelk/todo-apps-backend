@@ -1,8 +1,8 @@
-name: Node.JS CI/CD
+name: Node.JS CI/CD - test
 
 on:
-  # push:
-  #   branches: [main]
+  push:
+    branches: [pipeline-backend]
   workflow_dispatch:
 
 jobs:
@@ -24,22 +24,31 @@ jobs:
 
   test:
     name: 🧪 Testing Backend
+    needs: DemoSonarCloudScan
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, prettier, sonarscan] # Test dijalankan jika semua job sebelumnya berhasil
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
     steps:
       - name: ⬇ Checkout repository
         uses: actions/checkout@v4
 
       - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
-          node-version: 20
+          node-version: ${{matrix.node-version}}
 
       - name: 📥 Install dependencies
-        run: npm install --frozen-lockfile
+        run: npm install
 
       - name: 🧪 Run Tests
         run: npm test
+        env: 
+          DBHOST: ${{ secrets.DBHOST }}
+          TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
   # test:
   #   name: Test
   #   runs-on: ubuntu-latest
