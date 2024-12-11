@@ -75,17 +75,11 @@ export default class Database {
   }
   async createCategories(data) {
     const request = this.poolconnection.request();
-
-    // Menambahkan input parameter ke query
     request.input("name", sql.NVarChar(255), data.name);
-
-    // Query untuk menyisipkan data ke tabel 'tasks'
     const result = await request.query(
       `INSERT INTO categories (name) 
        VALUES (@name)`,
     );
-
-    // Mengembalikan jumlah baris yang terpengaruh
     return result.rowsAffected[0];
   }
   async updateCategories(id, data) {
@@ -111,8 +105,6 @@ export default class Database {
     return result.rowsAffected[0];
   }
 
-  // Tasks
-  // Return all Tasks
   async readAllTasks() {
     const request = this.poolconnection.request();
     const result =
@@ -134,10 +126,8 @@ export default class Database {
   async getPriorityIdByName(priorityName) {
     const request = this.poolconnection.request();
 
-    // Menambahkan input parameter untuk mencari ID priority berdasarkan nama
     request.input("priority_name", sql.NVarChar(255), priorityName);
 
-    // Query untuk mencari ID priority
     const result = await request.query(
       `SELECT id 
          FROM priorities 
@@ -236,7 +226,6 @@ export default class Database {
     }
     request.input("due_date", sql.Date, data.due_date);
 
-    // Tambahkan input untuk isDone (jika diberikan)
     if (typeof data.isDone !== "undefined") {
       request.input("isDone", sql.Bit, data.isDone);
     }
