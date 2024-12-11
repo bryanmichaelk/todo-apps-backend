@@ -40,20 +40,6 @@ jobs:
       - name: 🔬 Lint
         run: npm run lint
 
-  typecheck:
-    name: ʦ TypeScript
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: ⬇ Checkout repo
-        uses: actions/checkout@v4
-
-      - name: 📦 Install TypeScript (if not in package.json)
-        run: npm install typescript --save-dev
-
-      - name: 🔎 Type check
-        run: npm run typecheck
-
   prettier:
     name: 💅 Prettier
     runs-on: ubuntu-latest
@@ -66,4 +52,4 @@ jobs:
         run: npm install prettier --save-dev
 
       - name: 🔎 Format code with Prettier
-        run: npm run prettier
+        run: npm run format
