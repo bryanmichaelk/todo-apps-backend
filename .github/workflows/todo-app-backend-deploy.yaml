@@ -1,63 +1,108 @@
-name: Node.JS CI/CD
+name: Test Node.js CI/CD 
 
 on:
   push:
-    branches: [main]
+    branches: [pipeline-backend]
+  pull_request:
+    branches: [pipeline-backend]
   workflow_dispatch:
 
 jobs:
-  DemoSonarCloudScan:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v3
-          with:
-            fetch-depth: 0
-        - name: SonarCloud Scan
-          uses: sonarsource/sonarcloud-github-action@master
-          env:
-            GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          with:
-            args: >
-              -Dsonar.projectKey=todo-apps-backend
-              -Dsonar.organization=bryanmichaelk
-  # test:
-  #   name: Test
-  #   runs-on: ubuntu-latest
+  lint:
+    name: 🔍 Linting (ESLint)
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇ Checkout repository
+        uses: actions/checkout@v4
 
-  #   strategy:
-  #     matrix:
-  #       node-version: [20.x]
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3 # was "v2" before
-  #       with:
-  #         fetch-depth: 0
+      - name: 📥 Install dependencies
+        run: npm install --frozen-lockfile
 
-  #     - name: Use Node.JS ${{ matrix.node-version }}
-  #       uses: actions/setup-node@v3 # was "v2" before
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
+      - name: 🔬 Run ESLint
+        run: npm run lint
 
-  #     - name: NPM install, build and test
-  #       run: |
-  #         npm install
-  #         npm run 
-  #       env:
-  #         DBHOST: ${{ secrets.DBHOST }}
-  #         TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
-  #         JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+  typecheck:
+    name: ʦ Type Checking (TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇ Checkout repository
+        uses: actions/checkout@v4
 
-  # Heavily modified deploy job to fit render.com
-  # deploy:
-  #   name: Deploy
-  #   # needs: [test] # Our tests must pass in order to run the deploy job
-  #   runs-on: ubuntu-latest
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-  #   steps:
-  #     - name: Deploy to production
-  #       uses: johnbeynon/render-deploy-action@v0.0.8
-  #       with:
-  #         service-id: ${{ secrets.SERVICE_ID }} # Can be found as part of the Deploy Hook
-  #         api-key: ${{ secrets.RENDER_API_KEY }} # Create your API key in Render Dashboard > Account Settings
+      - name: 📥 Install dependencies
+        run: npm install --frozen-lockfile
+
+      - name: 🔎 Run TypeScript Type Check
+        run: npm run typecheck
+
+  prettier:
+    name: 💅 Code Formatting (Prettier)
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: 📥 Install dependencies
+        run: npm install --frozen-lockfile
+
+      - name: 💅 Run Prettier Check
+        run: npm run format
+
+  sonarscan:
+    name: 📊 SonarCloud Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇ Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: 📥 Install dependencies
+        run: npm install --frozen-lockfile
+
+      - name: 📊 Run SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=todo-apps-backend
+            -Dsonar.organization=bryanmichaelk
+  test:
+    name: 🧪 Testing Backend
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, prettier, sonarscan] # Test dijalankan jika semua job sebelumnya berhasil
+    steps:
+      - name: ⬇ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: 📥 Install dependencies
+        run: npm install --frozen-lockfile
+
+      - name: 🧪 Run Tests
+        run: npm test

@@ -8,6 +8,8 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "lint": "eslint .",
+    "format": "prettier --check .",
+    "typecheck": "tsc --noEmit",
     "build": "webpack"
   },
   "keywords": [],
