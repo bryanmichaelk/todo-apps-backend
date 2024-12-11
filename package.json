@@ -31,7 +31,13 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.25.9",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
     "eslint": "^9.16.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
     "prettier": "^3.4.2",
     "typescript": "^5.7.2",
     "webpack": "^5.97.1",
