@@ -1,4 +1,5 @@
 name: Code Check
+
 on:
   push:
     branches:
@@ -8,54 +9,52 @@ on:
       - pipeline-backend
 
 jobs:
+  setup:
+    name: Setup Node.js and Install Dependencies
+    runs-on: ubuntu-latest
+    outputs:
+      node-version: ${{ steps.node-version.outputs.node-version }}
+    steps:
+      - name: ⬇ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: 📥 Download deps
+        run: npm install --frozen-lockfile
+
   lint:
     name: ⬣ ESLint
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - name: ⬇ Checkout repo
         uses: actions/checkout@v4
-
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: 📥 Download deps
-        run: npm install --frozen-lockfile
 
       - name: 🔬 Lint
         run: npm run lint
+
   typecheck:
     name: ʦ TypeScript
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - name: ⬇ Checkout repo
         uses: actions/checkout@v4
-
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: 📥 Download deps
-        run: npm install --frozen-lockfile
 
       - name: 🔎 Type check
         run: npm run typecheck
+
   prettier:
     name: 💅 Prettier
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - name: ⬇ Checkout repo
         uses: actions/checkout@v4
 
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: 📥 Download deps
-        run: npm install --frozen-lockfile
-
-      - name: 🔎 Type check
-        run: npm run format
+      - name: 🔎 Format code with Prettier
+        run: npm run prettier
