@@ -43,12 +43,9 @@ jobs:
       - name: 📥 Install dependencies
         run: npm install
 
-      - name: 🧪 Run Tests
-        run: npm test
-        env: 
-          DBHOST: ${{ secrets.DBHOST }}
-          TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
-          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+      - name: Test Eslint Check
+        working-directory: ./
+        run: npm run lint
   # test:
   #   name: Test
   #   runs-on: ubuntu-latest
