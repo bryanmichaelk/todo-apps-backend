@@ -34,6 +34,9 @@ jobs:
       - name: ⬇ Checkout repo
         uses: actions/checkout@v4
 
+      - name: 📦 Install ESLint (if not in package.json)
+        run: npm install eslint --save-dev
+
       - name: 🔬 Lint
         run: npm run lint
 
@@ -45,6 +48,9 @@ jobs:
       - name: ⬇ Checkout repo
         uses: actions/checkout@v4
 
+      - name: 📦 Install TypeScript (if not in package.json)
+        run: npm install typescript --save-dev
+
       - name: 🔎 Type check
         run: npm run typecheck
 
@@ -55,6 +61,9 @@ jobs:
     steps:
       - name: ⬇ Checkout repo
         uses: actions/checkout@v4
+
+      - name: 📦 Install Prettier (if not in package.json)
+        run: npm install prettier --save-dev
 
       - name: 🔎 Format code with Prettier
         run: npm run prettier
