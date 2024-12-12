@@ -1,14 +1,12 @@
-import * as dotenv from 'dotenv';
-import 'dotenv/config';
-import sql from 'mssql';
+import * as dotenv from "dotenv";
+import "dotenv/config";
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   dotenv.config({ path: `.env.${process.env.NODE_ENV}`, debug: true });
 }
 
 const server = process.env.AZURE_SQL_SERVER;
 const database = process.env.AZURE_SQL_DATABASE;
-const port = process.env.AZURE_SQL_PORT;
 const type = process.env.AZURE_SQL_AUTHENTICATIONTYPE;
 const user = process.env.AZURE_SQL_USER;
 const password = process.env.AZURE_SQL_PASSWORD;
@@ -33,7 +31,6 @@ export const noPasswordConfig = {
     trustServerCertificate: false,
   },
 };
-
 
 export const passwordConfig = {
   server,

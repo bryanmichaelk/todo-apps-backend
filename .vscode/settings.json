@@ -1,5 +1,5 @@
 {
-  "appService.zipIgnorePattern": ["./.env*","node_modules{,/**}"],
+  "appService.zipIgnorePattern": ["./.env*", "node_modules{,/**}"],
   "appService.defaultWebAppToDeploy": "/subscriptions/cefb8c55-ec8c-4206-bacb-51b83e9fc197/resourceGroups/todo-apps_group/providers/Microsoft.Web/sites/todo-apps-backend-pso-24",
   "appService.deploySubpath": "."
 }
