@@ -2,7 +2,7 @@ name: Node.JS CI/CD - test
 
 on:
   push:
-    branches: [pipeline-backend]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
