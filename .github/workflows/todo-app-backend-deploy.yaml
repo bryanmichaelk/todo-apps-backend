@@ -5,38 +5,45 @@ on:
     branches: [main]
 
 jobs:
-  # test:
-  #   name: Test
-  #   runs-on: ubuntu-latest
+  SonarCloudScan:
+      name: 🥽 SonarCloud Scan
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+        - name: SonarCloud Scan
+          uses: sonarsource/sonarcloud-github-action@master
+          env:
+            GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          with:
+            args: >
+              -Dsonar.projectKey=todo-apps-backend
+              -Dsonar.organization=bryanmichaelk
+  lint:
+    name: ⬣ ESLint
+    runs-on: ubuntu-latest
+    needs: SonarCloudScan
+    steps:
+      - name: ⬇ Checkout repo
+        uses: actions/checkout@v4
 
-  #   strategy:
-  #     matrix:
-  #       node-version: [20.x]
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3 # was "v2" before
-  #       with:
-  #         fetch-depth: 0
+      - name: 📥 Download deps
+        run: npm install --frozen-lockfile
 
-  #     - name: Use Node.JS ${{ matrix.node-version }}
-  #       uses: actions/setup-node@v3 # was "v2" before
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
-
-  #     - name: NPM install, build and test
-  #       run: |
-  #         npm install
-  #         npm run
-  #       env:
-  #         DBHOST: ${{ secrets.DBHOST }}
-  #         TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
-  #         JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+      - name: 🔬 Lint
+        run: npm run lint
 
   # Heavily modified deploy job to fit render.com
   deploy:
-    name: Deploy
-    # needs: [test] # Our tests must pass in order to run the deploy job
+    name: 🪞Deploy To Render
+    needs: lint
     runs-on: ubuntu-latest
 
     steps:
