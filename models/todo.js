@@ -5,7 +5,7 @@ import { createDatabaseConnection } from "../config/database.js";
 const router = express.Router();
 router.use(express.json());
 
-const database = createDatabaseConnection(SQLAuthentication);
+const database = await createDatabaseConnection(SQLAuthentication);
 
 router.get("/priorities", async (req, res) => {
   try {
@@ -161,10 +161,12 @@ router.post("/tasks", async (req, res) => {
       !tasks.category_name ||
       !tasks.due_date
     ) {
-      return res.status(400).json({
-        error:
-          "Field name, priority_name, category_name, and due_date are required.",
-      });
+      return res
+        .status(400)
+        .json({
+          error:
+            "Field name, priority_name, category_name, and due_date are required.",
+        });
     }
 
     // Panggil fungsi createTasksWithNames untuk memproses input
