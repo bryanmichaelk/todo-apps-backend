@@ -1,12 +1,7 @@
-import express from "express";
-import cors from "cors";
-import * as dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
 import 'dotenv/config';
-import sql from 'mssql';
 import todoRoutes from './models/todo.js';
-
-
-
 
 const server = process.env.AZURE_SQL_SERVER;
 const database = process.env.AZURE_SQL_DATABASE;
@@ -26,20 +21,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.listen(5000, () => console.log("Server up and running..."));
+app.listen(5000, () => console.log('Server up and running...'));
 app.use('/api/todo', todoRoutes);
 
-app.get("/get", (req, res) => {
+app.get('/get', (req, res) => {
   res.status(200).json({
-    status: "UP",
-    message: "Server is running",
+    status: 'UP',
+    message: 'Server is running',
     timestamp: new Date().toISOString(),
   });
 });
 
 // Define route for the root path
 app.get('/', (req, res) => {
-    res.status(200).send('Welcome to the Todo App API! Dor');
+  res.status(200).send('Welcome to the Todo App API! Dor');
 });
 
 // const PORT = 5000;
