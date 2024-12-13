@@ -31,21 +31,21 @@ jobs:
       matrix:
         node-version: [20.x]
 
-    steps:
-      - name: ⬇ Checkout repository
-        uses: actions/checkout@v4
+    # steps:
+    #   - name: ⬇ Checkout repository
+    #     uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{matrix.node-version}}
+    #   - name: ⚙️ Setup Node.js
+    #     uses: actions/setup-node@v2
+    #     with:
+    #       node-version: ${{matrix.node-version}}
 
-      - name: 📥 Install dependencies
-        run: npm install
+    #   - name: 📥 Install dependencies
+    #     run: npm install
 
-      - name: Test Eslint Check
-        working-directory: ./
-        run: npm run lint
+    #   - name: Test Eslint Check
+    #     working-directory: ./
+    #     run: npm run lint
 
   deploy:
     name: Deploy

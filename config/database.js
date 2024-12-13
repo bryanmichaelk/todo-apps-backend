@@ -1,14 +1,12 @@
 import sql from "mssql";
 
 export default class Database {
-  // config = {};
-  // poolconnection = null;
-  // connected = false;
+  config = {};
+  poolconnection = null;
+  connected = false;
 
   constructor(config) {
-    this.config = config || {}; // Default to an empty object if config is not provided
-    this.poolconnection = null;
-    this.connected = false;
+    this.config = config;
   }
 
   async connect() {
