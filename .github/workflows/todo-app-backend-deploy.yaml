@@ -40,8 +40,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
+      - name: Tes
+        run: npm install
       - name: Deploy to production
-        uses: johnbeynon/render-deploy-action@v0.0.8
-        with:
-          service-id: ${{ secrets.SERVICE_ID }} # Can be found as part of the Deploy Hook
-          api-key: ${{ secrets.RENDER_API_KEY }} # Create your API key in Render Dashboard > Account Settings
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL}}
+        run: |
+          curl -X POST $deploy_url
