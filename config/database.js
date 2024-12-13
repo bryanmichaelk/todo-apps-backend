@@ -1,7 +1,5 @@
 import sql from 'mssql';
 
-let database = null;
-
 export default class Database {
   config = {};
   poolconnection = null;
@@ -75,29 +73,28 @@ export default class Database {
   }
   async createCategories(data) {
     const request = this.poolconnection.request();
-  
+
     // Menambahkan input parameter ke query
     request.input('name', sql.NVarChar(255), data.name);
-  
+
     // Query untuk menyisipkan data ke tabel 'tasks'
     const result = await request.query(
       `INSERT INTO categories (name) 
        VALUES (@name)`
     );
-  
+
     // Mengembalikan jumlah baris yang terpengaruh
     return result.rowsAffected[0];
   }
   async updateCategories(id, data) {
     const idAsNumber = Number(id);
     const request = this.poolconnection.request();
-      
 
     request.input('name', sql.NVarChar(255), data.name);
 
     const result = await request
-    .input('id', sql.Int, idAsNumber)
-    .query(`UPDATE categories SET name=@name WHERE id=@id`);
+      .input('id', sql.Int, idAsNumber)
+      .query(`UPDATE categories SET name=@name WHERE id=@id`);
 
     return result.rowsAffected[0];
   }
@@ -116,7 +113,8 @@ export default class Database {
   // Return all Tasks
   async readAllTasks() {
     const request = this.poolconnection.request();
-    const result = await request.query(`SELECT tasks.id,tasks.name as title,priorities.name as priority,categories.name as category,tasks.due_date,tasks.isDone as isDone
+    const result =
+      await request.query(`SELECT tasks.id,tasks.name as title,priorities.name as priority,categories.name as category,tasks.due_date,tasks.isDone as isDone
       FROM tasks inner join priorities on tasks.priority_id = priorities.id inner join categories on tasks.category_id = categories.id`);
 
     return result.recordsets;
@@ -124,8 +122,7 @@ export default class Database {
 
   async readTasks(id) {
     const request = this.poolconnection.request();
-    const result = await request
-      .input('id', sql.Int, +id)
+    const result = await request.input('id', sql.Int, +id)
       .query(`SELECT tasks.id,tasks.name as title,priorities.name as priority,categories.name as category,tasks.due_date,tasks.isDone as isDone
       FROM tasks inner join priorities on tasks.priority_id = priorities.id inner join categories on tasks.category_id = categories.id WHERE tasks.id = @id`);
 
@@ -140,31 +137,31 @@ export default class Database {
 
     // Query untuk mencari ID priority
     const result = await request.query(
-        `SELECT id 
+      `SELECT id 
          FROM priorities 
          WHERE name = @priority_name`
     );
 
     // Jika hasil ditemukan, kembalikan ID
     return result.recordset.length > 0 ? result.recordset[0].id : null;
-}
+  }
 
-async getCategoryIdByName(categoryName) {
-  const request = this.poolconnection.request();
+  async getCategoryIdByName(categoryName) {
+    const request = this.poolconnection.request();
 
-  // Menambahkan input parameter untuk mencari ID category berdasarkan nama
-  request.input('category_name', sql.NVarChar(255), categoryName);
+    // Menambahkan input parameter untuk mencari ID category berdasarkan nama
+    request.input('category_name', sql.NVarChar(255), categoryName);
 
-  // Query untuk mencari ID category
-  const result = await request.query(
+    // Query untuk mencari ID category
+    const result = await request.query(
       `SELECT id 
        FROM categories 
        WHERE name = @category_name`
-  );
+    );
 
-  // Jika hasil ditemukan, kembalikan ID
-  return result.recordset.length > 0 ? result.recordset[0].id : null;
-}
+    // Jika hasil ditemukan, kembalikan ID
+    return result.recordset.length > 0 ? result.recordset[0].id : null;
+  }
 
   async createTasksWithNames(data) {
     const request = this.poolconnection.request();
@@ -172,13 +169,17 @@ async getCategoryIdByName(categoryName) {
     // Cari ID priority berdasarkan nama
     const priorityId = await this.getPriorityIdByName(data.priority_name);
     if (!priorityId) {
-        throw new Error(`Priority dengan nama "${data.priority_name}" tidak ditemukan.`);
+      throw new Error(
+        `Priority dengan nama "${data.priority_name}" tidak ditemukan.`
+      );
     }
 
     // Cari ID category berdasarkan nama
     const categoryId = await this.getCategoryIdByName(data.category_name);
     if (!categoryId) {
-        throw new Error(`Category dengan nama "${data.category_name}" tidak ditemukan.`);
+      throw new Error(
+        `Category dengan nama "${data.category_name}" tidak ditemukan.`
+      );
     }
 
     // Menambahkan input parameter untuk insert data
@@ -189,69 +190,72 @@ async getCategoryIdByName(categoryName) {
 
     // Query untuk menyisipkan data ke tabel 'tasks'
     const result = await request.query(
-        `INSERT INTO tasks (name, priority_id, category_id, due_date) 
+      `INSERT INTO tasks (name, priority_id, category_id, due_date) 
          VALUES (@name, @priority_id, @category_id, @due_date)`
     );
 
     // Mengembalikan jumlah baris yang terpengaruh
     return result.rowsAffected[0];
-}
+  }
 
-async updateTasks(id, data) {
-  const idAsNumber = Number(id);
-  const request = this.poolconnection.request();
+  async updateTasks(id, data) {
+    const idAsNumber = Number(id);
+    const request = this.poolconnection.request();
 
-  // Cari ID priority berdasarkan nama (jika diberikan)
-  let priorityId = null;
-  if (data.priority_name) {
+    // Cari ID priority berdasarkan nama (jika diberikan)
+    let priorityId = null;
+    if (data.priority_name) {
       priorityId = await this.getPriorityIdByName(data.priority_name);
       if (!priorityId) {
-          throw new Error(`Priority dengan nama "${data.priority_name}" tidak ditemukan.`);
+        throw new Error(
+          `Priority dengan nama "${data.priority_name}" tidak ditemukan.`
+        );
       }
-  }
+    }
 
-  // Cari ID category berdasarkan nama (jika diberikan)
-  let categoryId = null;
-  if (data.category_name) {
+    // Cari ID category berdasarkan nama (jika diberikan)
+    let categoryId = null;
+    if (data.category_name) {
       categoryId = await this.getCategoryIdByName(data.category_name);
       if (!categoryId) {
-          throw new Error(`Category dengan nama "${data.category_name}" tidak ditemukan.`);
+        throw new Error(
+          `Category dengan nama "${data.category_name}" tidak ditemukan.`
+        );
       }
-  }
+    }
 
-  // Menambahkan input parameter untuk query UPDATE
-  request.input('name', sql.NVarChar(255), data.name);
-  if (priorityId !== null) {
+    // Menambahkan input parameter untuk query UPDATE
+    request.input('name', sql.NVarChar(255), data.name);
+    if (priorityId !== null) {
       request.input('priority_id', sql.Int, priorityId);
-  }
-  if (categoryId !== null) {
+    }
+    if (categoryId !== null) {
       request.input('category_id', sql.Int, categoryId);
-  }
-  request.input('due_date', sql.Date, data.due_date);
+    }
+    request.input('due_date', sql.Date, data.due_date);
 
-  // Tambahkan input untuk isDone (jika diberikan)
-  if (typeof data.isDone !== "undefined") {
+    // Tambahkan input untuk isDone (jika diberikan)
+    if (typeof data.isDone !== 'undefined') {
       request.input('isDone', sql.Bit, data.isDone);
-  }
+    }
 
-  // Query UPDATE
-  const columnsToUpdate = [];
-  if (data.name) columnsToUpdate.push("name = @name");
-  if (priorityId !== null) columnsToUpdate.push("priority_id = @priority_id");
-  if (categoryId !== null) columnsToUpdate.push("category_id = @category_id");
-  if (data.due_date) columnsToUpdate.push("due_date = @due_date");
-  if (typeof data.isDone !== "undefined") columnsToUpdate.push("isDone = @isDone");
+    // Query UPDATE
+    const columnsToUpdate = [];
+    if (data.name) columnsToUpdate.push('name = @name');
+    if (priorityId !== null) columnsToUpdate.push('priority_id = @priority_id');
+    if (categoryId !== null) columnsToUpdate.push('category_id = @category_id');
+    if (data.due_date) columnsToUpdate.push('due_date = @due_date');
+    if (typeof data.isDone !== 'undefined')
+      columnsToUpdate.push('isDone = @isDone');
 
-  const result = await request
-      .input('id', sql.Int, idAsNumber)
-      .query(`
+    const result = await request.input('id', sql.Int, idAsNumber).query(`
           UPDATE tasks 
-          SET ${columnsToUpdate.join(", ")}
+          SET ${columnsToUpdate.join(', ')}
           WHERE id = @id
       `);
 
-  return result.rowsAffected[0];
-}
+    return result.rowsAffected[0];
+  }
 
   async deleteTasks(id) {
     const idAsNumber = Number(id);

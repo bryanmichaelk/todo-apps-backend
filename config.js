@@ -1,7 +1,7 @@
-import * as dotenv from "dotenv";
-import "dotenv/config";
+import * as dotenv from 'dotenv';
+import 'dotenv/config';
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === 'development') {
   dotenv.config({ path: `.env.${process.env.NODE_ENV}`, debug: true });
 }
 
