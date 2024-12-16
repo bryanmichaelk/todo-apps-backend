@@ -33,7 +33,7 @@ _After downloading all prequities, you can follow this setup steps:_
 
 1. Clone the repo
    ```sh
-   git clone [https://github.com/jhoniananta/todo-apps-devops.git](https://github.com/bryanmichaelk/todo-apps-backend.git)
+   git clone https://github.com/bryanmichaelk/todo-apps-backend.git
    ```
 2. Go to clone directory
    ```sh
